@@ -6,6 +6,14 @@ import regex
 
 # ACRONYMS
 lol_regex = regex.compile(r"(^|[^A-z])l+o+l+(l*o*l)*($|[^A-z])", regex.IGNORECASE)
+def build_acronym_matcher(acronym, template=None):
+    if template:
+        expression = template.format(acronym)
+    else:
+        acronym_with_repeats = "".join([letter + "+" for letter in acronym])
+        expression = r"(^|[^A-z]){}($|[^A-z])".format(acronym_with_repeats)
+    re = regex.compile(expression, regex.IGNORECASE)
+    return lambda comment: [match[0] for match in re.finditer(comment)]
 
 # REPLACEMENT FORMS
 def build_replacement_form_matcher(word, ignorecase=True,
@@ -17,16 +25,15 @@ def build_replacement_form_matcher(word, ignorecase=True,
         re = regex.compile(expression)
     return lambda comment: [match[0] for match in re.finditer(comment)]
 
-
-
 # WORDS WITH A REPEATED CHARATER
-repeated_char_regex = regex.compile(r"[^.\s]*(?P<char>[^.\s])\g<char>{2,}[^.\s]*", regex.IGNORECASE)
+REPEATED_CHAR_REGEX = regex.compile(r"[^.\s]*(?P<char>[^.\s])\g<char>{2,}[^.\s]*", regex.IGNORECASE)
+def repeated_character_matcher(comment):
+    return [match[0] for match in REPEATED_CHAR_REGEX.finditer(comment)]
 
+# LAUGHTER
 def lol_matcher(comment):
     return [match[0] for match in lol_regex.finditer(comment)]
 
-def repeated_character_matcher(comment):
-    return [match[0] for match in repeated_char_regex.finditer(comment)]
 
 def build_count_object(matcher):
     return {
@@ -37,6 +44,10 @@ def build_count_object(matcher):
 
 def count_all_in_csv(reader):
     """ count the things """
+    acronyms = [
+        "omg", "omfg", "lmao", "lmfao", "btw","wtf",
+        "nvm", "np", "smh", "ftw"
+    ]
     replacement_forms = [
         "for", "you", "u", "your", "ur", "before", "be4", "b4",
         "though", "tho", "because", "becuz", "bcuz", "cuz", "bc",
@@ -45,6 +56,10 @@ def count_all_in_csv(reader):
 
     token_counts = OrderedDict()
     token_counts['lol'] = build_count_object(lol_matcher)
+    token_counts["k"] = build_count_object(build_acronym_matcher("k", template=r"(^|\s){}($|\s)"))
+    token_counts["kk"] = build_count_object(build_acronym_matcher("(kk|kkkk+)", template=r"(^|\s){}($|\s)"))
+    for acronym in acronyms:
+        token_counts[acronym] = build_count_object(build_acronym_matcher(acronym))
 
     token_counts["I"] = build_count_object(build_replacement_form_matcher("I", ignorecase=False))
     token_counts["i"] = build_count_object(build_replacement_form_matcher("i", ignorecase=False))
