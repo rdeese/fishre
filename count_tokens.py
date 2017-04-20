@@ -48,8 +48,7 @@ def build_count_object(matcher):
         'matcher': matcher
     }
 
-def count_all_in_csv(reader):
-    """ count the things """
+def build_token_counts_object():
     acronyms = [
         "omg", "omfg", "lmao", "lmfao", "btw","wtf",
         "nvm", "np", "smh", "ftw"
@@ -61,6 +60,7 @@ def count_all_in_csv(reader):
     ]
 
     token_counts = OrderedDict()
+
     token_counts['lol'] = build_count_object(lol_matcher)
     token_counts["k"] = build_count_object(build_acronym_matcher("k", template=r"(^|\s){}($|\s)"))
     token_counts["kk"] = build_count_object(build_acronym_matcher("(kk|kkkk+)", template=r"(^|\s){}($|\s)"))
@@ -76,6 +76,11 @@ def count_all_in_csv(reader):
     token_counts["haha"] = build_count_object(haha_matcher)
     token_counts["hehe"] = build_count_object(hehe_matcher)
 
+    return token_counts
+
+
+def count_all_in_csv(reader):
+    token_counts = build_token_counts_object()
     repeats_dict = defaultdict(lambda: 0)
     
     reader.__next__() # pop off the header
