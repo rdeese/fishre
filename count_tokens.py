@@ -25,7 +25,7 @@ def count_all_in_csv(reader):
     reader.__next__() # pop off the header
 
     for entry in reader:
-        comment = entry[3]
+        comment = entry[3] or entry[10]
         repeats = repeated_character_matcher(comment)
         for repeat in repeats:
             repeats_dict[repeat] += 1
