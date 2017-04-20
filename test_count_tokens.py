@@ -6,6 +6,9 @@ class TestMatchers(unittest.TestCase):
         self.assertEqual(lol_matcher("lol"), ["lol"])
         self.assertEqual(lol_matcher("lolol"), ["lolol"])
 
+        self.assertEqual(lol_matcher("LOL"), ["LOL"])
+        self.assertEqual(lol_matcher("LolOLoL"), ["LolOLoL"])
+
         self.assertEqual(len(lol_matcher("ol")), 0)
         self.assertEqual(len(lol_matcher("lo")), 0)
         self.assertEqual(len(lol_matcher("lollipop")), 0)
