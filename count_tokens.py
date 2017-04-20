@@ -4,7 +4,7 @@ import json
 from collections import defaultdict
 import regex
 
-lol_regex = regex.compile(r"(^|[^A-z]+)l+o+l+(l*o*l)*($|[^A-z]+)", regex.IGNORECASE)
+lol_regex = regex.compile(r"(^|[^A-z])l+o+l+(l*o*l)*($|[^A-z])", regex.IGNORECASE)
 repeated_char_regex = regex.compile(r"[^.\s]*(?P<char>[^.\s])\g<char>{2,}[^.\s]*", regex.IGNORECASE)
 
 def lol_matcher(comment):
