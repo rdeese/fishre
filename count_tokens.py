@@ -4,7 +4,17 @@ import json
 from collections import defaultdict
 import regex
 
+# ACRONYMS
 lol_regex = regex.compile(r"(^|[^A-z])l+o+l+(l*o*l)*($|[^A-z])", regex.IGNORECASE)
+
+# REPLACEMENT FORMS
+def build_replacement_form_matcher(word):
+    re = regex.compile(r"(^|[^A-z]){}($|[^A-z])".format(word), regex.IGNORECASE)
+    return lambda comment: [match[0] for match in re.finditer(comment)]
+
+you_matcher = build_replacement_form_matcher("you")
+u_matcher = build_replacement_form_matcher("u")
+
 repeated_char_regex = regex.compile(r"[^.\s]*(?P<char>[^.\s])\g<char>{2,}[^.\s]*", regex.IGNORECASE)
 
 def lol_matcher(comment):
@@ -17,7 +27,9 @@ def repeated_character_matcher(comment):
 def count_all_in_csv(reader):
     """ count the things """
     token_counts = {
-        'lol': { 'matcher': lol_matcher, 'count': 0, 'matches': [] }
+        'lol': { 'matcher': lol_matcher, 'count': 0, 'matches': [] },
+        'you': { 'matcher': you_matcher, 'count': 0, 'matches': [] },
+        'u': { 'matcher': u_matcher, 'count': 0, 'matches': [] }
     }
 
     repeats_dict = defaultdict(lambda: 0)
