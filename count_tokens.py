@@ -17,7 +17,7 @@ def repeated_character_matcher(comment):
 def count_all_in_csv(reader):
     """ count the things """
     token_counts = {
-        'lol': { 'matcher': lol_matcher, 'count': 0 }
+        'lol': { 'matcher': lol_matcher, 'count': 0, 'matches': [] }
     }
 
     repeats_dict = defaultdict(lambda: 0)
@@ -31,9 +31,12 @@ def count_all_in_csv(reader):
             repeats_dict[repeat] += 1
 
         for token in token_counts.keys():
-            token_counts[token]['count'] += len(token_counts[token]['matcher'](comment))
+            matches = token_counts[token]['matcher'](comment)
+            token_counts[token]['count'] += len(matches)
+            token_counts[token]['matches'].extend(matches)
 
-    return ([[token, value['count']] for token, value in token_counts.items()],
+    return ([[token, value['count'], value['matches']]
+             for token, value in token_counts.items()],
             sorted(repeats_dict.items(), key=lambda x: x[1]))
 
 def main():
@@ -47,7 +50,7 @@ def main():
             token_counts, repeat_counts = count_all_in_csv(csv.reader(csv_file))
         with open(os.path.join(count_dir, name + "-tokens.csv"), 'w') as outfile:
             writer = csv.writer(outfile)
-            writer.writerow(['token', 'count'])
+            writer.writerow(['token', 'count', 'matches'])
             writer.writerows(token_counts)
         with open(os.path.join(count_dir, name + "-repeats.csv"), 'w') as outfile:
             writer = csv.writer(outfile)
