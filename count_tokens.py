@@ -5,7 +5,10 @@ from collections import defaultdict, OrderedDict
 import regex
 
 # ACRONYMS
-lol_regex = regex.compile(r"(^|[^A-z])l+o+l+(l*o*l)*($|[^A-z])", regex.IGNORECASE)
+lol_regex = regex.compile(r"(^|[^A-z])l+(o+l+)+($|[^A-z])", regex.IGNORECASE)
+def lol_matcher(comment):
+    return [match[0] for match in lol_regex.finditer(comment)]
+
 def build_acronym_matcher(acronym, template=None):
     if template:
         expression = template.format(acronym)
@@ -31,9 +34,12 @@ def repeated_character_matcher(comment):
     return [match[0] for match in REPEATED_CHAR_REGEX.finditer(comment)]
 
 # LAUGHTER
-def lol_matcher(comment):
-    return [match[0] for match in lol_regex.finditer(comment)]
-
+haha_regex = regex.compile(r"[^\s]*(h+a+h+a+)+[^\s]*", regex.IGNORECASE)
+def haha_matcher(comment):
+    return [match[0] for match in haha_regex.finditer(comment)]
+hehe_regex = regex.compile(r"[^\s]*(h+e+h+e+)+[^\s]*", regex.IGNORECASE)
+def hehe_matcher(comment):
+    return [match[0] for match in hehe_regex.finditer(comment)]
 
 def build_count_object(matcher):
     return {
@@ -64,9 +70,11 @@ def count_all_in_csv(reader):
     token_counts["I"] = build_count_object(build_replacement_form_matcher("I", ignorecase=False))
     token_counts["i"] = build_count_object(build_replacement_form_matcher("i", ignorecase=False))
     token_counts["4"] = build_count_object(build_replacement_form_matcher("4", template=r"(^|\s){}($|\s)"))
-
     for form in replacement_forms:
         token_counts[form] = build_count_object(build_replacement_form_matcher(form))
+
+    token_counts["haha"] = build_count_object(haha_matcher)
+    token_counts["hehe"] = build_count_object(hehe_matcher)
 
     repeats_dict = defaultdict(lambda: 0)
     
