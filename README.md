@@ -14,7 +14,7 @@ directory.
 git clone https://github.com/rdeese/fishre.git
 cd fishre
 cp -r /path/to/my/comment/csvs /csv
-python count_tokens.py
+python fishre.py
 open output
 ```
 
