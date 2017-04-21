@@ -102,11 +102,20 @@ def format_output_table(tables):
     combined_table = zip(*tables)
     return [reduce(lambda a,b: a+b, row) for row in combined_table]
 
+def format_summary_table(total_length, total_words, num_comments):
+    return [
+        ["NUMBER OF COMMENTS"], [num_comments],
+        ["TOTAL WORDS"], [total_words],
+        ["AVERAGE COMMENT LENGTH (CHARACTERS)"], [total_length/num_comments],
+        ["AVERAGE COMMENT LENGTH (WORDS)"], [total_words/num_comments],
+    ]
+
 def count_all_in_csv(reader):
     acronym_counts = build_acronym_counts_object()
     form_counts = build_form_counts_object()
     laughter_counts = build_laughter_counts_object()
     repeats_dict = defaultdict(lambda: 0)
+    total_words = 0
     total_length = 0
     num_comments = 0
     
@@ -118,6 +127,7 @@ def count_all_in_csv(reader):
         if len(comment) != 0:
             num_comments += 1
         total_length += len(comment)
+        total_words += len(comment.split())
 
         repeats = repeated_character_matcher(comment)
         for repeat in repeats:
@@ -130,11 +140,11 @@ def count_all_in_csv(reader):
                 token_counts[token]['matches'].extend(matches)
 
     return (
+        format_summary_table(total_length, total_words, num_comments),
         format_token_count_table(acronym_counts, "ACRONYMS"),
         format_token_count_table(form_counts, "REPLACEMENT FORMS"),
         format_token_count_table(laughter_counts, "LAUGHTER"),
-        format_repeats_table(repeats_dict),
-        [["AVERAGE COMMENT LENGTH"], [total_length/num_comments]]
+        format_repeats_table(repeats_dict)
     )
 
 def main():
