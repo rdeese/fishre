@@ -150,6 +150,10 @@ def count_all_in_csv(reader):
 def main():
     csv_dir = "csv"
     count_dir = "output"
+
+    if not os.path.exists(count_dir):
+        os.makedirs(count_dir)
+
     for filename in os.listdir(csv_dir):
         name, ext = os.path.splitext(filename)
         if ext != ".csv":
